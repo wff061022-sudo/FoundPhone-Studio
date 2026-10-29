@@ -33,6 +33,30 @@ export const layoutSchema = z
 export type DeviceLayout = z.infer<typeof layoutSchema>;
 export type Widget = z.infer<typeof widgetSchema>;
 export type AppConfig = Work["apps"][number];
+
+const previewSecondPageApps = [
+  "whatsapp",
+  "instagram",
+  "youtube",
+  "twitter",
+  "spotify",
+  "snapchat",
+  "forum",
+];
+const previewRemovedApps = [
+  "redbook",
+  "bilibili",
+  "alipay",
+  "wechat",
+  "qq",
+  "taobao",
+  "delivery",
+  "douyin",
+  "discord",
+  "facebook",
+  "line",
+  "netease",
+];
 export function ensureAppStore(work: Work): Work {
   return work.apps.some((a) => a.id === "appstore")
     ? work
@@ -57,7 +81,7 @@ export function defaultLayout(input: Work): DeviceLayout {
   return {
     version: 1,
     workId: w.id,
-    previewLayoutRevision: w.id === "ui-test-phone-v2" ? 1 : 0,
+    previewLayoutRevision: w.id === "ui-test-phone-v2" ? 2 : 0,
     apps: structuredClone(w.apps)
       .sort((a, b) => (a.id === "appstore" ? -1 : b.id === "appstore" ? 1 : 0))
       .map((a) =>
@@ -68,7 +92,15 @@ export function defaultLayout(input: Work): DeviceLayout {
     widgets: [],
     order: [],
     cleared: [],
-    positions: {},
+    positions:
+      w.id === "ui-test-phone-v2"
+        ? Object.fromEntries(
+            previewSecondPageApps.map((id, index) => [
+              id,
+              { page: 1, x: index % 4, y: Math.floor(index / 4) },
+            ]),
+          )
+        : {},
   };
 }
 export function validateLayout(raw: unknown, input: Work) {
@@ -117,6 +149,62 @@ export function validateLayout(raw: unknown, input: Work) {
       ...layout.order.filter((id) => !visibleApps.includes(id)),
     ];
     layout.previewLayoutRevision = 1;
+  }
+  if (w.id === "ui-test-phone-v2" && layout.previewLayoutRevision < 2) {
+    const reserved = previewSecondPageApps.map((id, index) => ({
+      id,
+      x: index % 4,
+      y: Math.floor(index / 4),
+    }));
+    const reservedCells = new Set(
+      reserved.map((cell) => `1:${cell.x}:${cell.y}`),
+    );
+    const entries = homeEntries(layout);
+    for (const [key, position] of Object.entries(layout.positions)) {
+      if (position.page !== 1 || previewSecondPageApps.includes(key)) continue;
+      const entry = entries.find((candidate) => candidate.key === key);
+      const width = entry?.widget
+        ? entry.widget.size === "small"
+          ? 2
+          : 4
+        : 1;
+      const height = entry?.widget
+        ? entry.widget.size === "large"
+          ? 4
+          : 2
+        : 1;
+      let overlaps = false;
+      for (let y = position.y; y < position.y + height; y++)
+        for (let x = position.x; x < position.x + width; x++)
+          if (reservedCells.has(`1:${x}:${y}`)) overlaps = true;
+      if (overlaps) delete layout.positions[key];
+    }
+    for (const id of previewRemovedApps) {
+      const app = layout.apps.find((candidate) => candidate.id === id);
+      const authored = w.apps.find((candidate) => candidate.id === id);
+      if (app && authored && !authored.installed) {
+        app.installed = false;
+        app.visible = false;
+        app.dock = false;
+        app.folder = "";
+      }
+      delete layout.positions[id];
+    }
+    for (const [index, id] of previewSecondPageApps.entries()) {
+      const app = layout.apps.find((candidate) => candidate.id === id);
+      if (app) {
+        app.installed = true;
+        app.visible = true;
+        app.dock = false;
+        app.folder = "";
+        layout.positions[id] = {
+          page: 1,
+          x: index % 4,
+          y: Math.floor(index / 4),
+        };
+      }
+    }
+    layout.previewLayoutRevision = 2;
   }
   const entries = homeEntries(layout),
     packed = packHome(entries, layout.positions);
