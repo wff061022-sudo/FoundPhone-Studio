@@ -3,7 +3,7 @@
   "id": "ui-test-phone-v2",
   "title": "捡手机",
   "description": "自定义手机设置与 KakaoTalk 好友列表",
-  "revision": 5,
+  "revision": 6,
   "phone": {
     "owner": "机主",
     "date": "2026-10-25",
@@ -44,21 +44,21 @@
     "calculator",
     "settings",
     "weibo",
-    "forum",
-    "whatsapp",
-    "instagram",
     "tiktok",
-    "twitter",
     "telegram",
-    "youtube",
-    "snapchat",
     "messenger",
     "reddit",
-    "spotify",
     "netflix",
     "pinterest",
     "threads",
-    "kakao"
+    "kakao",
+    "whatsapp",
+    "instagram",
+    "youtube",
+    "twitter",
+    "spotify",
+    "snapchat",
+    "forum"
   ],
   "contacts": [
     {
