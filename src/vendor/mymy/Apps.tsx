@@ -335,7 +335,7 @@ export function MymyInstagram(p: SkinProps) {
     ),
     profileName = profile?.meta.profileName || p.owner || "机主",
     profileSignature = profile?.meta.profileSignature || "",
-    profileAvatar = profile?.meta.profileAvatar || "";
+    profileAvatar = profile?.avatar || "";
   const toggle = (id: string, values: string[], set: (v: string[]) => void) =>
     set(values.includes(id) ? values.filter((v) => v !== id) : [...values, id]);
   useEffect(() => {
