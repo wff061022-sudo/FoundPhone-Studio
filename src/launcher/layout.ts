@@ -81,7 +81,7 @@ export function defaultLayout(input: Work): DeviceLayout {
   return {
     version: 1,
     workId: w.id,
-    previewLayoutRevision: w.id === "ui-test-phone-v2" ? 3 : 0,
+    previewLayoutRevision: w.id === "ui-test-phone-v2" ? 4 : 0,
     apps: structuredClone(w.apps)
       .sort((a, b) => (a.id === "appstore" ? -1 : b.id === "appstore" ? 1 : 0))
       .map((a) =>
@@ -150,7 +150,7 @@ export function validateLayout(raw: unknown, input: Work) {
     ];
     layout.previewLayoutRevision = 1;
   }
-  if (w.id === "ui-test-phone-v2" && layout.previewLayoutRevision < 3) {
+  if (w.id === "ui-test-phone-v2" && layout.previewLayoutRevision < 4) {
     const reserved = previewSecondPageApps.map((id, index) => ({
       id,
       x: index % 4,
@@ -204,7 +204,8 @@ export function validateLayout(raw: unknown, input: Work) {
         };
       }
     }
-    layout.previewLayoutRevision = 3;
+    layout.cleared = layout.cleared.filter((id) => id !== "instagram");
+    layout.previewLayoutRevision = 4;
   }
   const entries = homeEntries(layout),
     packed = packHome(entries, layout.positions);
