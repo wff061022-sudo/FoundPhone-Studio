@@ -156,6 +156,24 @@ export function ItemEditor({
             )}
           </label>
         )}
+        {app === "instagram" && (
+          <div className="check-row">
+            <label>
+              <input
+                type="checkbox"
+                aria-label="作为Instagram快拍展示"
+                checked={draft.meta?.story === "true"}
+                onChange={(e) =>
+                  setField("meta", {
+                    ...draft.meta,
+                    story: e.target.checked ? "true" : "false",
+                  })
+                }
+              />
+              作为 Instagram 快拍展示
+            </label>
+          </div>
+        )}
         {getFields(app).length > 0 && (
           <div className="two-cols">
             {getFields(app).map((field) => (
