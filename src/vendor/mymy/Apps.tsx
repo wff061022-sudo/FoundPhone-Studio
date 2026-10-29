@@ -445,6 +445,17 @@ export function MymyInstagram(p: SkinProps) {
           <span className="igl2">
             {selected ? "帖子" : tab === "主页" ? "Instagram" : tab}
           </span>
+          <button
+            aria-label={`查看Instagram快拍（${stories.length}）`}
+            title="查看快拍"
+            onClick={() => {
+              setSelected(null);
+              setTab("主页");
+              if (stories.length) openStory(0);
+            }}
+          >
+            快拍
+          </button>
           <button aria-label="打开私信" onClick={() => setTab("私信")}>
             <Send />
           </button>
