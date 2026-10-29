@@ -330,6 +330,12 @@ export function MymyInstagram(p: SkinProps) {
     stories = p.items.filter((i) => i.meta.story === "true"),
     dms = p.items.filter((i) => i.folder === "私信"),
     active = stories[story - 1];
+  const profile = p.items.find(
+      (i) => i.meta.profileName || i.meta.profileSignature || i.meta.profileAvatar,
+    ),
+    profileName = profile?.meta.profileName || p.owner || "机主",
+    profileSignature = profile?.meta.profileSignature || "",
+    profileAvatar = profile?.meta.profileAvatar || "";
   const toggle = (id: string, values: string[], set: (v: string[]) => void) =>
     set(values.includes(id) ? values.filter((v) => v !== id) : [...values, id]);
   useEffect(() => {
@@ -487,7 +493,7 @@ export function MymyInstagram(p: SkinProps) {
           {!selected && tab === "个人主页" && (
             <>
               <div className="pf">
-                <Avatar name={p.owner || "机主"} />
+                <Avatar name={profileName} src={profileAvatar} />
                 <div className="ps">
                   <div>
                     <b>{posts.length}</b>
@@ -503,7 +509,7 @@ export function MymyInstagram(p: SkinProps) {
                   </div>
                 </div>
               </div>
-              <p className="pn">{p.owner}</p>
+              <p className="pn"><b>{profileName}</b>{profileSignature && <><br />{profileSignature}</>}</p>
               <div className="ptab">
                 <div className="on">
                   <Grid />
